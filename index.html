@@ -5,75 +5,329 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Last Z – Migration Registration</title>
   <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { background: #0f0f0f; color: #eee; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; display: flex; flex-direction: column; align-items: center; padding: 40px 16px; min-height: 100vh; }
 
-    /* Language Switcher */
-    .lang-bar { display: flex; gap: 8px; margin-bottom: 28px; }
-    .lang-btn { padding: 6px 16px; border-radius: 20px; border: 1px solid #333; background: #1a1a1a; color: #888; font-size: 13px; cursor: pointer; transition: all 0.2s; }
-    .lang-btn:hover { border-color: #f0a500; color: #f0a500; }
-    .lang-btn.active { background: #f0a500; color: #111; border-color: #f0a500; font-weight: bold; }
+    body {
+      background: #080808;
+      color: #e0e0e0;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 48px 16px 60px;
+      min-height: 100vh;
+      background-image:
+        radial-gradient(ellipse at 20% 20%, rgba(180,180,180,0.03) 0%, transparent 60%),
+        radial-gradient(ellipse at 80% 80%, rgba(120,120,120,0.04) 0%, transparent 60%);
+    }
 
-    /* Card */
-    .card { background: #1a1a1a; border: 1px solid #2a2a2a; border-radius: 14px; padding: 32px 28px; max-width: 460px; width: 100%; }
-    h2 { color: #f0a500; text-align: center; margin-bottom: 6px; font-size: 22px; }
-    .subtitle { text-align: center; color: #555; font-size: 13px; margin-bottom: 28px; }
+    /* ── Language Bar ── */
+    .lang-bar {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 32px;
+      background: #111;
+      border: 1px solid #222;
+      border-radius: 30px;
+      padding: 5px;
+    }
+    .lang-btn {
+      padding: 6px 18px;
+      border-radius: 24px;
+      border: none;
+      background: transparent;
+      color: #555;
+      font-size: 13px;
+      font-weight: 500;
+      font-family: 'Inter', sans-serif;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      letter-spacing: 0.3px;
+    }
+    .lang-btn:hover { color: #bbb; }
+    .lang-btn.active {
+      background: linear-gradient(135deg, #c0c0c0, #888);
+      color: #0a0a0a;
+      font-weight: 700;
+      box-shadow: 0 2px 12px rgba(180,180,180,0.2);
+    }
 
-    /* Form Elements */
-    label { display: block; margin: 16px 0 6px; font-size: 12px; color: #888; text-transform: uppercase; letter-spacing: 0.6px; }
-    input, select { width: 100%; padding: 11px 14px; background: #222; border: 1px solid #383838; border-radius: 8px; color: #fff; font-size: 15px; transition: border 0.2s; -webkit-appearance: none; }
-    input:focus, select:focus { outline: none; border-color: #f0a500; }
-    select option { background: #222; }
+    /* ── Card ── */
+    .card {
+      background: linear-gradient(160deg, #141414, #0e0e0e);
+      border: 1px solid #1f1f1f;
+      border-radius: 20px;
+      padding: 36px 32px;
+      max-width: 480px;
+      width: 100%;
+      box-shadow:
+        0 0 0 1px rgba(255,255,255,0.03),
+        0 24px 60px rgba(0,0,0,0.6),
+        inset 0 1px 0 rgba(255,255,255,0.05);
+      position: relative;
+      overflow: hidden;
+    }
 
-    /* Button */
-    button.submit-btn { margin-top: 26px; width: 100%; padding: 13px; background: #f0a500; color: #111; font-weight: bold; border: none; border-radius: 9px; font-size: 16px; cursor: pointer; transition: background 0.2s; }
-    button.submit-btn:hover:not(:disabled) { background: #ffc233; }
-    button.submit-btn:disabled { background: #444; color: #666; cursor: not-allowed; }
+    /* Subtle top shimmer line */
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 10%; right: 10%;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(200,200,200,0.15), transparent);
+    }
 
-    /* Status */
-    #status { margin-top: 16px; text-align: center; font-size: 14px; min-height: 20px; padding: 10px; border-radius: 7px; }
-    .status-success { background: rgba(80,200,80,0.1); color: #5fc85f; }
-    .status-error   { background: rgba(200,80,80,0.1); color: #e06060; }
-    .status-warning { background: rgba(240,165,0,0.1); color: #f0a500; }
-    .status-info    { color: #777; }
+    /* ── Header ── */
+    .card-header {
+      text-align: center;
+      margin-bottom: 32px;
+    }
+    .card-icon {
+      font-size: 36px;
+      display: block;
+      margin-bottom: 12px;
+      filter: drop-shadow(0 0 12px rgba(200,200,200,0.2));
+    }
+    h2 {
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      background: linear-gradient(135deg, #e8e8e8, #888);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 6px;
+    }
+    .subtitle {
+      color: #3a3a3a;
+      font-size: 12px;
+      font-weight: 400;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+    }
 
-    /* Retry */
-    #retryNotice { font-size: 12px; color: #555; text-align: center; margin-top: 8px; min-height: 16px; }
+    /* ── Form Fields ── */
+    .field-group { margin-top: 20px; }
 
-    /* Footer */
-    .footer { margin-top: 32px; font-size: 12px; color: #444; text-align: center; }
+    label {
+      display: block;
+      margin-bottom: 7px;
+      font-size: 11px;
+      font-weight: 600;
+      color: #555;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .field-hint {
+      font-size: 12px;
+      color: #383838;
+      margin-bottom: 8px;
+      line-height: 1.6;
+      font-weight: 400;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 12px 16px;
+      background: #0c0c0c;
+      border: 1px solid #242424;
+      border-radius: 10px;
+      color: #ddd;
+      font-size: 14px;
+      font-family: 'Inter', sans-serif;
+      font-weight: 400;
+      transition: all 0.2s ease;
+      -webkit-appearance: none;
+      appearance: none;
+    }
+
+    input::placeholder { color: #2e2e2e; }
+
+    input:focus, select:focus {
+      outline: none;
+      border-color: #555;
+      background: #0f0f0f;
+      box-shadow: 0 0 0 3px rgba(150,150,150,0.07), 0 0 20px rgba(150,150,150,0.04);
+      color: #eee;
+    }
+
+    /* Custom select arrow */
+    .select-wrapper { position: relative; }
+    .select-wrapper::after {
+      content: '▾';
+      position: absolute;
+      right: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #444;
+      pointer-events: none;
+      font-size: 14px;
+    }
+    select option { background: #111; color: #ddd; }
+
+    /* ── Optional Badge ── */
+    .label-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 7px;
+    }
+    .label-row label { margin-bottom: 0; }
+    .optional-badge {
+      font-size: 9px;
+      font-weight: 600;
+      background: #181818;
+      color: #444;
+      border: 1px solid #2a2a2a;
+      border-radius: 4px;
+      padding: 2px 7px;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+    }
+
+    /* ── Divider ── */
+    .divider {
+      border: none;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, #1e1e1e, transparent);
+      margin: 28px 0 8px;
+    }
+
+    /* ── Submit Button ── */
+    .submit-btn {
+      margin-top: 28px;
+      width: 100%;
+      padding: 14px;
+      background: linear-gradient(135deg, #c8c8c8, #787878);
+      color: #080808;
+      font-weight: 700;
+      font-family: 'Inter', sans-serif;
+      font-size: 14px;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      box-shadow: 0 4px 20px rgba(150,150,150,0.15);
+      position: relative;
+      overflow: hidden;
+    }
+    .submit-btn::before {
+      content: '';
+      position: absolute;
+      top: 0; left: -100%;
+      width: 100%; height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+      transition: left 0.4s ease;
+    }
+    .submit-btn:hover::before { left: 100%; }
+    .submit-btn:hover:not(:disabled) {
+      background: linear-gradient(135deg, #dedede, #999);
+      box-shadow: 0 6px 28px rgba(180,180,180,0.25);
+      transform: translateY(-1px);
+    }
+    .submit-btn:active:not(:disabled) { transform: translateY(0px); }
+    .submit-btn:disabled {
+      background: linear-gradient(135deg, #222, #1a1a1a);
+      color: #3a3a3a;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+
+    /* ── Status ── */
+    #status {
+      margin-top: 16px;
+      text-align: center;
+      font-size: 13px;
+      font-weight: 500;
+      min-height: 20px;
+      padding: 10px 14px;
+      border-radius: 8px;
+      transition: all 0.3s ease;
+      letter-spacing: 0.2px;
+    }
+    .status-success { background: rgba(100,200,100,0.07); color: #6dbf6d; border: 1px solid rgba(100,200,100,0.12); }
+    .status-error   { background: rgba(200,80,80,0.07);  color: #c96060; border: 1px solid rgba(200,80,80,0.12); }
+    .status-warning { background: rgba(180,160,80,0.07); color: #b8a84a; border: 1px solid rgba(180,160,80,0.12); }
+    .status-info    { color: #333; border: none; background: none; }
+
+    /* ── Retry Notice ── */
+    #retryNotice {
+      font-size: 11px;
+      color: #333;
+      text-align: center;
+      margin-top: 8px;
+      min-height: 16px;
+      letter-spacing: 0.2px;
+    }
+
+    /* ── Footer ── */
+    .footer {
+      margin-top: 36px;
+      font-size: 11px;
+      color: #272727;
+      text-align: center;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+    }
   </style>
 </head>
 <body>
 
   <!-- Language Switcher -->
   <div class="lang-bar">
-    <button class="lang-btn active" onclick="setLang('en')">EN</button>
-    <button class="lang-btn" onclick="setLang('jp')">日本語</button>
-    <button class="lang-btn" onclick="setLang('kr')">한국어</button>
+    <button class="lang-btn active" onclick="setLang('en', this)">EN</button>
+    <button class="lang-btn" onclick="setLang('jp', this)">日本語</button>
+    <button class="lang-btn" onclick="setLang('kr', this)">한국어</button>
   </div>
 
-  <!-- Form Card -->
+  <!-- Card -->
   <div class="card">
-    <h2 id="txt-title">⚔️ Migration Registration</h2>
-    <p class="subtitle" id="txt-subtitle">Last Z – Server Migration Event</p>
+    <div class="card-header">
+      <span class="card-icon">⚔️</span>
+      <h2 id="txt-title">Migration Registration</h2>
+      <p class="subtitle" id="txt-subtitle">Last Z · Server Migration Event</p>
+    </div>
 
-    <label id="lbl-server"></label>
-    <input type="text" id="server" maxlength="20"/>
+    <div class="field-group">
+      <label id="lbl-server"></label>
+      <input type="text" id="server" maxlength="20"/>
+    </div>
 
-    <label id="lbl-tier"></label>
-    <select id="tier">
-      <option value="" id="opt-placeholder"></option>
-      <option value="Tier 1" id="opt-t1"></option>
-      <option value="Tier 2" id="opt-t2"></option>
-      <option value="Tier 3" id="opt-t3"></option>
-      <option value="Tier 4" id="opt-t4"></option>
-    </select>
+    <div class="field-group">
+      <label id="lbl-tier"></label>
+      <div class="select-wrapper">
+        <select id="tier">
+          <option value="" id="opt-placeholder"></option>
+          <option value="Tier 1" id="opt-t1"></option>
+          <option value="Tier 2" id="opt-t2"></option>
+          <option value="Tier 3" id="opt-t3"></option>
+          <option value="Tier 4" id="opt-t4"></option>
+        </select>
+      </div>
+    </div>
 
-    <label id="lbl-username"></label>
-    <input type="text" id="username" maxlength="50"/>
+    <div class="field-group">
+      <label id="lbl-username"></label>
+      <input type="text" id="username" maxlength="50"/>
+    </div>
 
-    <button class="submit-btn" id="submitBtn" onclick="submitForm()" id="txt-submit"></button>
+    <hr class="divider"/>
+
+    <div class="field-group">
+      <div class="label-row">
+        <label id="lbl-invited-text"></label>
+        <span class="optional-badge" id="lbl-optional"></span>
+      </div>
+      <p class="field-hint" id="hint-invited"></p>
+      <input type="text" id="invitedBy" maxlength="50"/>
+    </div>
+
+    <button class="submit-btn" id="submitBtn" onclick="submitForm()"></button>
     <div id="status"></div>
     <div id="retryNotice"></div>
   </div>
@@ -81,163 +335,151 @@
   <div class="footer" id="txt-footer"></div>
 
 <script>
-  const SCRIPT_URL = "YOUR_APPS_SCRIPT_WEB_APP_URL_HERE";
+  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxdY3P1Qk-MVBFLamYNkehg5AgPDydtdok4U_yDCQ7pIi90WKWRvL9_t9-Br-9j-4Ta/exec";
   const MAX_RETRIES = 3;
   const RETRY_DELAY = 3000;
 
-  // ── Language Strings ──────────────────────────────────────────
   const LANGS = {
     en: {
-      title:       "⚔️ Migration Registration",
-      subtitle:    "Last Z – Server Migration Event",
-      lblServer:   "Server Number",
-      lblTier:     "Migration Tier",
-      lblUsername: "In-Game Username",
-      placeholder: "-- Select Your Tier --",
-      serverPH:    "e.g. S123",
-      usernamePH:  "Your IGN",
-      submit:      "Submit Registration",
-      submitting:  "Submitting...",
-      success:     "✅ Registered! See you at the migration.",
-      duplicate:   "⚠️ Already registered with this username and server.",
-      missingFields:"⚠️ Please fill in all fields.",
-      networkFail: "❌ Could not connect. Data saved locally — retry when online.",
-      retrying:    (a, m) => `Connection issue — retrying... (${a}/${m})`,
-      footer:      "© Last Z SGSI · Migration Event",
-      tiers:       ["Tier 1", "Tier 2", "Tier 3", "Tier 4"]
+      title:        "Migration Registration",
+      subtitle:     "Last Z · Server Migration Event",
+      lblServer:    "Server Number",
+      lblTier:      "Migration Tier",
+      lblUsername:  "In-Game Username",
+      lblInvited:   "Invited By",
+      optional:     "Optional",
+      hintInvited:  "Were you invited by someone? Enter the name of the player who invited you (e.g. a player from your state, or someone from S284 who brought you along).",
+      placeholder:  "Select your tier",
+      serverPH:     "e.g. S123",
+      usernamePH:   "Your IGN",
+      invitedPH:    "Inviting player's IGN",
+      submit:       "Submit Registration",
+      submitting:   "Submitting...",
+      success:      "✓  Registered successfully. See you at the migration.",
+      duplicate:    "⚠  Already registered with this username and server.",
+      missingFields:"⚠  Please fill in all required fields.",
+      networkFail:  "✕  Could not connect. Data saved locally — retry when online.",
+      retrying:     (a, m) => `Connection issue — retrying... (${a}/${m})`,
+      footer:       "Last Z SGSI · Migration Event",
+      tiers:        ["Tier 1", "Tier 2", "Tier 3", "Tier 4"]
     },
     jp: {
-      title:       "⚔️ 移住登録",
-      subtitle:    "Last Z – サーバー移住イベント",
-      lblServer:   "サーバー番号",
-      lblTier:     "移住ティア",
-      lblUsername: "ゲーム内ユーザー名",
-      placeholder: "-- ティアを選択 --",
-      serverPH:    "例: S123",
-      usernamePH:  "IGN を入力",
-      submit:      "登録する",
-      submitting:  "送信中...",
-      success:     "✅ 登録完了！移住イベントでお会いしましょう。",
-      duplicate:   "⚠️ このユーザー名とサーバーはすでに登録されています。",
-      missingFields:"⚠️ すべての項目を入力してください。",
-      networkFail: "❌ 接続できませんでした。データはローカルに保存されました。オンライン時に再試行してください。",
-      retrying:    (a, m) => `接続エラー — 再試行中... (${a}/${m})`,
-      footer:      "© Last Z SGSI · 移住イベント",
-      tiers:       ["ティア 1", "ティア 2", "ティア 3", "ティア 4"]
+      title:        "移住登録",
+      subtitle:     "Last Z · サーバー移住イベント",
+      lblServer:    "サーバー番号",
+      lblTier:      "移住ティア",
+      lblUsername:  "ゲーム内ユーザー名",
+      lblInvited:   "招待者名",
+      optional:     "任意",
+      hintInvited:  "誰かに招待されましたか？招待してくれたプレイヤーの名前を入力してください（例：同じ州のプレイヤー、またはS284から一緒に来た方など）。",
+      placeholder:  "ティアを選択",
+      serverPH:     "例: S123",
+      usernamePH:   "IGN を入力",
+      invitedPH:    "招待者の IGN",
+      submit:       "登録する",
+      submitting:   "送信中...",
+      success:      "✓  登録完了！移住イベントでお会いしましょう。",
+      duplicate:    "⚠  このユーザー名とサーバーはすでに登録されています。",
+      missingFields:"⚠  すべての必須項目を入力してください。",
+      networkFail:  "✕  接続できませんでした。データはローカルに保存されました。",
+      retrying:     (a, m) => `接続エラー — 再試行中... (${a}/${m})`,
+      footer:       "Last Z SGSI · 移住イベント",
+      tiers:        ["ティア 1", "ティア 2", "ティア 3", "ティア 4"]
     },
     kr: {
-      title:       "⚔️ 이주 등록",
-      subtitle:    "Last Z – 서버 이주 이벤트",
-      lblServer:   "서버 번호",
-      lblTier:     "이주 티어",
-      lblUsername: "게임 내 닉네임",
-      placeholder: "-- 티어 선택 --",
-      serverPH:    "예: S123",
-      usernamePH:  "닉네임 입력",
-      submit:      "등록하기",
-      submitting:  "제출 중...",
-      success:     "✅ 등록 완료! 이주 이벤트에서 만나요.",
-      duplicate:   "⚠️ 이미 이 닉네임과 서버로 등록되어 있습니다.",
-      missingFields:"⚠️ 모든 항목을 입력해 주세요.",
-      networkFail: "❌ 연결할 수 없습니다. 데이터가 로컬에 저장되었습니다 — 온라인 상태에서 다시 시도하세요.",
-      retrying:    (a, m) => `연결 오류 — 재시도 중... (${a}/${m})`,
-      footer:      "© Last Z SGSI · 이주 이벤트",
-      tiers:       ["티어 1", "티어 2", "티어 3", "티어 4"]
+      title:        "이주 등록",
+      subtitle:     "Last Z · 서버 이주 이벤트",
+      lblServer:    "서버 번호",
+      lblTier:      "이주 티어",
+      lblUsername:  "게임 내 닉네임",
+      lblInvited:   "초대한 플레이어",
+      optional:     "선택",
+      hintInvited:  "누군가에게 초대받으셨나요? 초대해 준 플레이어의 닉네임을 입력해 주세요 (예: 같은 주의 플레이어, 또는 S284에서 함께 온 분).",
+      placeholder:  "티어 선택",
+      serverPH:     "예: S123",
+      usernamePH:   "닉네임 입력",
+      invitedPH:    "초대한 플레이어의 닉네임",
+      submit:       "등록하기",
+      submitting:   "제출 중...",
+      success:      "✓  등록 완료! 이주 이벤트에서 만나요.",
+      duplicate:    "⚠  이미 이 닉네임과 서버로 등록되어 있습니다.",
+      missingFields:"⚠  모든 필수 항목을 입력해 주세요.",
+      networkFail:  "✕  연결할 수 없습니다. 데이터가 로컬에 저장되었습니다.",
+      retrying:     (a, m) => `연결 오류 — 재시도 중... (${a}/${m})`,
+      footer:       "Last Z SGSI · 이주 이벤트",
+      tiers:        ["티어 1", "티어 2", "티어 3", "티어 4"]
     }
   };
 
   let currentLang = "en";
 
-  function setLang(lang) {
-    currentLang = lang;
+  function applyLang(lang) {
     const t = LANGS[lang];
-
-    // Update active button
-    document.querySelectorAll(".lang-btn").forEach(b => b.classList.remove("active"));
-    event.target.classList.add("active");
-
-    // Update all text
-    document.getElementById("txt-title").textContent    = t.title;
-    document.getElementById("txt-subtitle").textContent = t.subtitle;
-    document.getElementById("lbl-server").textContent   = t.lblServer;
-    document.getElementById("lbl-tier").textContent     = t.lblTier;
-    document.getElementById("lbl-username").textContent = t.lblUsername;
-    document.getElementById("submitBtn").textContent    = t.submit;
-    document.getElementById("txt-footer").textContent   = t.footer;
-    document.getElementById("server").placeholder       = t.serverPH;
-    document.getElementById("username").placeholder     = t.usernamePH;
-
-    // Update select options
+    currentLang = lang;
+    document.getElementById("txt-title").textContent       = t.title;
+    document.getElementById("txt-subtitle").textContent    = t.subtitle;
+    document.getElementById("lbl-server").textContent      = t.lblServer;
+    document.getElementById("lbl-tier").textContent        = t.lblTier;
+    document.getElementById("lbl-username").textContent    = t.lblUsername;
+    document.getElementById("lbl-invited-text").textContent = t.lblInvited;
+    document.getElementById("lbl-optional").textContent    = t.optional;
+    document.getElementById("hint-invited").textContent    = t.hintInvited;
+    document.getElementById("submitBtn").textContent       = t.submit;
+    document.getElementById("txt-footer").textContent      = t.footer;
+    document.getElementById("server").placeholder          = t.serverPH;
+    document.getElementById("username").placeholder        = t.usernamePH;
+    document.getElementById("invitedBy").placeholder       = t.invitedPH;
     document.getElementById("opt-placeholder").textContent = t.placeholder;
     document.getElementById("opt-t1").textContent = t.tiers[0];
     document.getElementById("opt-t2").textContent = t.tiers[1];
     document.getElementById("opt-t3").textContent = t.tiers[2];
     document.getElementById("opt-t4").textContent = t.tiers[3];
-
-    // Clear status on language change
     setStatus("", "info");
   }
 
-  // Init default language
-  document.addEventListener("DOMContentLoaded", () => {
-    // Auto-detect browser language
-    const browserLang = navigator.language.toLowerCase();
-    if (browserLang.startsWith("ja")) setLangSilent("jp");
-    else if (browserLang.startsWith("ko")) setLangSilent("kr");
-    else setLangSilent("en");
-  });
-
-  function setLangSilent(lang) {
-    currentLang = lang;
-    const t = LANGS[lang];
-    document.querySelectorAll(".lang-btn").forEach((b, i) => {
-      b.classList.toggle("active", ["en","jp","kr"][i] === lang);
-    });
-    document.getElementById("txt-title").textContent    = t.title;
-    document.getElementById("txt-subtitle").textContent = t.subtitle;
-    document.getElementById("lbl-server").textContent   = t.lblServer;
-    document.getElementById("lbl-tier").textContent     = t.lblTier;
-    document.getElementById("lbl-username").textContent = t.lblUsername;
-    document.getElementById("submitBtn").textContent    = t.submit;
-    document.getElementById("txt-footer").textContent   = t.footer;
-    document.getElementById("server").placeholder       = t.serverPH;
-    document.getElementById("username").placeholder     = t.usernamePH;
-    document.getElementById("opt-placeholder").textContent = t.placeholder;
-    document.getElementById("opt-t1").textContent = t.tiers[0];
-    document.getElementById("opt-t2").textContent = t.tiers[1];
-    document.getElementById("opt-t3").textContent = t.tiers[2];
-    document.getElementById("opt-t4").textContent = t.tiers[3];
+  function setLang(lang, btn) {
+    document.querySelectorAll(".lang-btn").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    applyLang(lang);
   }
 
-  // ── Form Submission ───────────────────────────────────────────
+  document.addEventListener("DOMContentLoaded", () => {
+    const bl = navigator.language.toLowerCase();
+    const detected = bl.startsWith("ja") ? "jp" : bl.startsWith("ko") ? "kr" : "en";
+    const btns = document.querySelectorAll(".lang-btn");
+    btns.forEach(b => b.classList.remove("active"));
+    btns[["en","jp","kr"].indexOf(detected)].classList.add("active");
+    applyLang(detected);
+  });
+
   async function submitForm() {
-    const t        = LANGS[currentLang];
-    const server   = document.getElementById("server").value.trim();
-    const tier     = document.getElementById("tier").value;
-    const username = document.getElementById("username").value.trim();
-    const btn      = document.getElementById("submitBtn");
+    const t         = LANGS[currentLang];
+    const server    = document.getElementById("server").value.trim();
+    const tier      = document.getElementById("tier").value;
+    const username  = document.getElementById("username").value.trim();
+    const invitedBy = document.getElementById("invitedBy").value.trim();
+    const btn       = document.getElementById("submitBtn");
 
     if (!server || !tier || !username) {
       setStatus(t.missingFields, "warning");
       return;
     }
 
-    const payload = { server, tier, username };
+    const payload = { server, tier, username, invitedBy: invitedBy || "" };
     btn.disabled = true;
     setStatus(t.submitting, "info");
 
-    const success = await submitWithRetry(payload, MAX_RETRIES);
+    const result = await submitWithRetry(payload, MAX_RETRIES);
 
-    if (success !== "duplicate") {
-      if (success === true) {
-        setStatus(t.success, "success");
-        document.getElementById("server").value = "";
-        document.getElementById("tier").value = "";
-        document.getElementById("username").value = "";
-      } else {
-        saveLocalBackup(payload);
-        setStatus(t.networkFail, "error");
-      }
+    if (result === true) {
+      setStatus(t.success, "success");
+      document.getElementById("server").value    = "";
+      document.getElementById("tier").value      = "";
+      document.getElementById("username").value  = "";
+      document.getElementById("invitedBy").value = "";
+    } else if (result !== "duplicate") {
+      saveLocalBackup(payload);
+      setStatus(t.networkFail, "error");
     }
 
     btn.disabled = false;
@@ -250,21 +492,15 @@
       try {
         const res  = await fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify(payload) });
         const data = await res.json();
-
         if (data.result === "success")   return true;
         if (data.result === "duplicate") {
-          setStatus(LANGS[currentLang].duplicate, "warning");
+          setStatus(t.duplicate, "warning");
           return "duplicate";
         }
         if (data.result === "error" && data.message === "Server busy, please retry") {
-          // fall through to retry
-        } else {
-          return false;
-        }
-      } catch (err) {
-        // Network failure — retry
-      }
-
+          // retry
+        } else { return false; }
+      } catch (err) { /* network failure — retry */ }
       if (attempt < retries) {
         document.getElementById("retryNotice").textContent = t.retrying(attempt, retries);
         await delay(RETRY_DELAY);
