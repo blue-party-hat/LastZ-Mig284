@@ -6,125 +6,273 @@
   <title>Last Z – Migration Registration</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { background: #0f0f0f; color: #eee; font-family: sans-serif; display: flex; justify-content: center; padding: 40px 16px; min-height: 100vh; }
+    body { background: #0f0f0f; color: #eee; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; display: flex; flex-direction: column; align-items: center; padding: 40px 16px; min-height: 100vh; }
+
+    /* Language Switcher */
+    .lang-bar { display: flex; gap: 8px; margin-bottom: 28px; }
+    .lang-btn { padding: 6px 16px; border-radius: 20px; border: 1px solid #333; background: #1a1a1a; color: #888; font-size: 13px; cursor: pointer; transition: all 0.2s; }
+    .lang-btn:hover { border-color: #f0a500; color: #f0a500; }
+    .lang-btn.active { background: #f0a500; color: #111; border-color: #f0a500; font-weight: bold; }
+
+    /* Card */
     .card { background: #1a1a1a; border: 1px solid #2a2a2a; border-radius: 14px; padding: 32px 28px; max-width: 460px; width: 100%; }
-    h2 { color: #f0a500; text-align: center; margin-bottom: 8px; font-size: 22px; }
-    .subtitle { text-align: center; color: #666; font-size: 13px; margin-bottom: 28px; }
-    label { display: block; margin: 16px 0 6px; font-size: 13px; color: #999; text-transform: uppercase; letter-spacing: 0.5px; }
-    input, select { width: 100%; padding: 11px 14px; background: #222; border: 1px solid #383838; border-radius: 8px; color: #fff; font-size: 15px; transition: border 0.2s; }
+    h2 { color: #f0a500; text-align: center; margin-bottom: 6px; font-size: 22px; }
+    .subtitle { text-align: center; color: #555; font-size: 13px; margin-bottom: 28px; }
+
+    /* Form Elements */
+    label { display: block; margin: 16px 0 6px; font-size: 12px; color: #888; text-transform: uppercase; letter-spacing: 0.6px; }
+    input, select { width: 100%; padding: 11px 14px; background: #222; border: 1px solid #383838; border-radius: 8px; color: #fff; font-size: 15px; transition: border 0.2s; -webkit-appearance: none; }
     input:focus, select:focus { outline: none; border-color: #f0a500; }
     select option { background: #222; }
-    button { margin-top: 26px; width: 100%; padding: 13px; background: #f0a500; color: #111; font-weight: bold; border: none; border-radius: 9px; font-size: 16px; cursor: pointer; transition: background 0.2s; }
-    button:hover:not(:disabled) { background: #ffc233; }
-    button:disabled { background: #555; color: #888; cursor: not-allowed; }
-    #status { margin-top: 16px; text-align: center; font-size: 14px; min-height: 20px; padding: 8px; border-radius: 6px; }
+
+    /* Button */
+    button.submit-btn { margin-top: 26px; width: 100%; padding: 13px; background: #f0a500; color: #111; font-weight: bold; border: none; border-radius: 9px; font-size: 16px; cursor: pointer; transition: background 0.2s; }
+    button.submit-btn:hover:not(:disabled) { background: #ffc233; }
+    button.submit-btn:disabled { background: #444; color: #666; cursor: not-allowed; }
+
+    /* Status */
+    #status { margin-top: 16px; text-align: center; font-size: 14px; min-height: 20px; padding: 10px; border-radius: 7px; }
     .status-success { background: rgba(80,200,80,0.1); color: #5fc85f; }
     .status-error   { background: rgba(200,80,80,0.1); color: #e06060; }
     .status-warning { background: rgba(240,165,0,0.1); color: #f0a500; }
-    .status-info    { color: #888; }
-    .retry-notice { font-size: 12px; color: #666; text-align: center; margin-top: 10px; display: none; }
+    .status-info    { color: #777; }
+
+    /* Retry */
+    #retryNotice { font-size: 12px; color: #555; text-align: center; margin-top: 8px; min-height: 16px; }
+
+    /* Footer */
+    .footer { margin-top: 32px; font-size: 12px; color: #444; text-align: center; }
   </style>
 </head>
 <body>
-<div class="card">
-  <h2>⚔️ Migration Registration</h2>
-  <p class="subtitle">Last Z – Server Migration Event</p>
 
-  <label>Server Number</label>
-  <input type="text" id="server" placeholder="e.g. S123" maxlength="20"/>
+  <!-- Language Switcher -->
+  <div class="lang-bar">
+    <button class="lang-btn active" onclick="setLang('en')">EN</button>
+    <button class="lang-btn" onclick="setLang('jp')">日本語</button>
+    <button class="lang-btn" onclick="setLang('kr')">한국어</button>
+  </div>
 
-  <label>Migration Tier</label>
-  <select id="tier">
-    <option value="">-- Select Your Tier --</option>
-    <option value="Tier 1">Tier 1</option>
-    <option value="Tier 2">Tier 2</option>
-    <option value="Tier 3">Tier 3</option>
-    <option value="Tier 4">Tier 4</option>
-  </select>
+  <!-- Form Card -->
+  <div class="card">
+    <h2 id="txt-title">⚔️ Migration Registration</h2>
+    <p class="subtitle" id="txt-subtitle">Last Z – Server Migration Event</p>
 
-  <label>In-Game Username</label>
-  <input type="text" id="username" placeholder="Your IGN" maxlength="50"/>
+    <label id="lbl-server"></label>
+    <input type="text" id="server" maxlength="20"/>
 
-  <button id="submitBtn" onclick="submitForm()">Submit Registration</button>
-  <div id="status"></div>
-  <div id="retryNotice" class="retry-notice"></div>
-</div>
+    <label id="lbl-tier"></label>
+    <select id="tier">
+      <option value="" id="opt-placeholder"></option>
+      <option value="Tier 1" id="opt-t1"></option>
+      <option value="Tier 2" id="opt-t2"></option>
+      <option value="Tier 3" id="opt-t3"></option>
+      <option value="Tier 4" id="opt-t4"></option>
+    </select>
+
+    <label id="lbl-username"></label>
+    <input type="text" id="username" maxlength="50"/>
+
+    <button class="submit-btn" id="submitBtn" onclick="submitForm()" id="txt-submit"></button>
+    <div id="status"></div>
+    <div id="retryNotice"></div>
+  </div>
+
+  <div class="footer" id="txt-footer"></div>
 
 <script>
   const SCRIPT_URL = "YOUR_APPS_SCRIPT_WEB_APP_URL_HERE";
   const MAX_RETRIES = 3;
-  const RETRY_DELAY = 3000; // 3 seconds between retries
+  const RETRY_DELAY = 3000;
 
+  // ── Language Strings ──────────────────────────────────────────
+  const LANGS = {
+    en: {
+      title:       "⚔️ Migration Registration",
+      subtitle:    "Last Z – Server Migration Event",
+      lblServer:   "Server Number",
+      lblTier:     "Migration Tier",
+      lblUsername: "In-Game Username",
+      placeholder: "-- Select Your Tier --",
+      serverPH:    "e.g. S123",
+      usernamePH:  "Your IGN",
+      submit:      "Submit Registration",
+      submitting:  "Submitting...",
+      success:     "✅ Registered! See you at the migration.",
+      duplicate:   "⚠️ Already registered with this username and server.",
+      missingFields:"⚠️ Please fill in all fields.",
+      networkFail: "❌ Could not connect. Data saved locally — retry when online.",
+      retrying:    (a, m) => `Connection issue — retrying... (${a}/${m})`,
+      footer:      "© Last Z SGSI · Migration Event",
+      tiers:       ["Tier 1", "Tier 2", "Tier 3", "Tier 4"]
+    },
+    jp: {
+      title:       "⚔️ 移住登録",
+      subtitle:    "Last Z – サーバー移住イベント",
+      lblServer:   "サーバー番号",
+      lblTier:     "移住ティア",
+      lblUsername: "ゲーム内ユーザー名",
+      placeholder: "-- ティアを選択 --",
+      serverPH:    "例: S123",
+      usernamePH:  "IGN を入力",
+      submit:      "登録する",
+      submitting:  "送信中...",
+      success:     "✅ 登録完了！移住イベントでお会いしましょう。",
+      duplicate:   "⚠️ このユーザー名とサーバーはすでに登録されています。",
+      missingFields:"⚠️ すべての項目を入力してください。",
+      networkFail: "❌ 接続できませんでした。データはローカルに保存されました。オンライン時に再試行してください。",
+      retrying:    (a, m) => `接続エラー — 再試行中... (${a}/${m})`,
+      footer:      "© Last Z SGSI · 移住イベント",
+      tiers:       ["ティア 1", "ティア 2", "ティア 3", "ティア 4"]
+    },
+    kr: {
+      title:       "⚔️ 이주 등록",
+      subtitle:    "Last Z – 서버 이주 이벤트",
+      lblServer:   "서버 번호",
+      lblTier:     "이주 티어",
+      lblUsername: "게임 내 닉네임",
+      placeholder: "-- 티어 선택 --",
+      serverPH:    "예: S123",
+      usernamePH:  "닉네임 입력",
+      submit:      "등록하기",
+      submitting:  "제출 중...",
+      success:     "✅ 등록 완료! 이주 이벤트에서 만나요.",
+      duplicate:   "⚠️ 이미 이 닉네임과 서버로 등록되어 있습니다.",
+      missingFields:"⚠️ 모든 항목을 입력해 주세요.",
+      networkFail: "❌ 연결할 수 없습니다. 데이터가 로컬에 저장되었습니다 — 온라인 상태에서 다시 시도하세요.",
+      retrying:    (a, m) => `연결 오류 — 재시도 중... (${a}/${m})`,
+      footer:      "© Last Z SGSI · 이주 이벤트",
+      tiers:       ["티어 1", "티어 2", "티어 3", "티어 4"]
+    }
+  };
+
+  let currentLang = "en";
+
+  function setLang(lang) {
+    currentLang = lang;
+    const t = LANGS[lang];
+
+    // Update active button
+    document.querySelectorAll(".lang-btn").forEach(b => b.classList.remove("active"));
+    event.target.classList.add("active");
+
+    // Update all text
+    document.getElementById("txt-title").textContent    = t.title;
+    document.getElementById("txt-subtitle").textContent = t.subtitle;
+    document.getElementById("lbl-server").textContent   = t.lblServer;
+    document.getElementById("lbl-tier").textContent     = t.lblTier;
+    document.getElementById("lbl-username").textContent = t.lblUsername;
+    document.getElementById("submitBtn").textContent    = t.submit;
+    document.getElementById("txt-footer").textContent   = t.footer;
+    document.getElementById("server").placeholder       = t.serverPH;
+    document.getElementById("username").placeholder     = t.usernamePH;
+
+    // Update select options
+    document.getElementById("opt-placeholder").textContent = t.placeholder;
+    document.getElementById("opt-t1").textContent = t.tiers[0];
+    document.getElementById("opt-t2").textContent = t.tiers[1];
+    document.getElementById("opt-t3").textContent = t.tiers[2];
+    document.getElementById("opt-t4").textContent = t.tiers[3];
+
+    // Clear status on language change
+    setStatus("", "info");
+  }
+
+  // Init default language
+  document.addEventListener("DOMContentLoaded", () => {
+    // Auto-detect browser language
+    const browserLang = navigator.language.toLowerCase();
+    if (browserLang.startsWith("ja")) setLangSilent("jp");
+    else if (browserLang.startsWith("ko")) setLangSilent("kr");
+    else setLangSilent("en");
+  });
+
+  function setLangSilent(lang) {
+    currentLang = lang;
+    const t = LANGS[lang];
+    document.querySelectorAll(".lang-btn").forEach((b, i) => {
+      b.classList.toggle("active", ["en","jp","kr"][i] === lang);
+    });
+    document.getElementById("txt-title").textContent    = t.title;
+    document.getElementById("txt-subtitle").textContent = t.subtitle;
+    document.getElementById("lbl-server").textContent   = t.lblServer;
+    document.getElementById("lbl-tier").textContent     = t.lblTier;
+    document.getElementById("lbl-username").textContent = t.lblUsername;
+    document.getElementById("submitBtn").textContent    = t.submit;
+    document.getElementById("txt-footer").textContent   = t.footer;
+    document.getElementById("server").placeholder       = t.serverPH;
+    document.getElementById("username").placeholder     = t.usernamePH;
+    document.getElementById("opt-placeholder").textContent = t.placeholder;
+    document.getElementById("opt-t1").textContent = t.tiers[0];
+    document.getElementById("opt-t2").textContent = t.tiers[1];
+    document.getElementById("opt-t3").textContent = t.tiers[2];
+    document.getElementById("opt-t4").textContent = t.tiers[3];
+  }
+
+  // ── Form Submission ───────────────────────────────────────────
   async function submitForm() {
+    const t        = LANGS[currentLang];
     const server   = document.getElementById("server").value.trim();
     const tier     = document.getElementById("tier").value;
     const username = document.getElementById("username").value.trim();
     const btn      = document.getElementById("submitBtn");
 
-    // Frontend validation
     if (!server || !tier || !username) {
-      setStatus("⚠️ Please fill in all fields.", "warning");
+      setStatus(t.missingFields, "warning");
       return;
     }
 
     const payload = { server, tier, username };
     btn.disabled = true;
-    setStatus("Submitting...", "info");
+    setStatus(t.submitting, "info");
 
-    // Attempt submission with automatic retry
     const success = await submitWithRetry(payload, MAX_RETRIES);
 
-    if (success) {
-      setStatus("✅ Registered successfully! See you at the migration.", "success");
-      document.getElementById("server").value = "";
-      document.getElementById("tier").value = "";
-      document.getElementById("username").value = "";
-    } else {
-      // Save locally as fallback if all retries fail
-      saveLocalBackup(payload);
-      setStatus("❌ Could not connect. Your data has been saved locally — tap Submit again when you have connection.", "error");
+    if (success !== "duplicate") {
+      if (success === true) {
+        setStatus(t.success, "success");
+        document.getElementById("server").value = "";
+        document.getElementById("tier").value = "";
+        document.getElementById("username").value = "";
+      } else {
+        saveLocalBackup(payload);
+        setStatus(t.networkFail, "error");
+      }
     }
 
     btn.disabled = false;
-    document.getElementById("retryNotice").style.display = "none";
+    document.getElementById("retryNotice").textContent = "";
   }
 
   async function submitWithRetry(payload, retries) {
+    const t = LANGS[currentLang];
     for (let attempt = 1; attempt <= retries; attempt++) {
       try {
-        const res = await fetch(SCRIPT_URL, {
-          method: "POST",
-          body: JSON.stringify(payload),
-        });
-
+        const res  = await fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify(payload) });
         const data = await res.json();
 
-        if (data.result === "success") return true;
+        if (data.result === "success")   return true;
         if (data.result === "duplicate") {
-          setStatus("⚠️ You are already registered with this username and server.", "warning");
-          return true; // Not a network error, stop retrying
+          setStatus(LANGS[currentLang].duplicate, "warning");
+          return "duplicate";
         }
         if (data.result === "error" && data.message === "Server busy, please retry") {
-          // Backend was locked — worth retrying
+          // fall through to retry
         } else {
-          return false; // Other backend error, don't retry
+          return false;
         }
-
       } catch (err) {
         // Network failure — retry
       }
 
       if (attempt < retries) {
-        document.getElementById("retryNotice").style.display = "block";
-        document.getElementById("retryNotice").textContent =
-          `Connection issue — retrying... (${attempt}/${retries})`;
+        document.getElementById("retryNotice").textContent = t.retrying(attempt, retries);
         await delay(RETRY_DELAY);
       }
     }
     return false;
   }
 
-  // Saves data to browser localStorage as a backup
   function saveLocalBackup(payload) {
     const backups = JSON.parse(localStorage.getItem("migrationBackup") || "[]");
     backups.push({ ...payload, savedAt: new Date().toISOString() });
@@ -137,9 +285,7 @@
     el.className = `status-${type}`;
   }
 
-  function delay(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
-  }
+  function delay(ms) { return new Promise(r => setTimeout(r, ms)); }
 </script>
 </body>
 </html>
