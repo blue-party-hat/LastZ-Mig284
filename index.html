@@ -69,8 +69,6 @@
       position: relative;
       overflow: hidden;
     }
-
-    /* Subtle top shimmer line */
     .card::before {
       content: '';
       position: absolute;
@@ -143,9 +141,7 @@
       -webkit-appearance: none;
       appearance: none;
     }
-
     input::placeholder { color: #2e2e2e; }
-
     input:focus, select:focus {
       outline: none;
       border-color: #555;
@@ -153,6 +149,11 @@
       box-shadow: 0 0 0 3px rgba(150,150,150,0.07), 0 0 20px rgba(150,150,150,0.04);
       color: #eee;
     }
+
+    /* Hide number input arrows */
+    input[type=number]::-webkit-inner-spin-button,
+    input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+    input[type=number] { -moz-appearance: textfield; }
 
     /* Custom select arrow */
     .select-wrapper { position: relative; }
@@ -167,6 +168,49 @@
       font-size: 14px;
     }
     select option { background: #111; color: #ddd; }
+
+    /* Score input with M unit */
+    .score-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+    .score-wrapper input { padding-right: 40px; }
+    .score-unit {
+      position: absolute;
+      right: 14px;
+      color: #555;
+      font-size: 14px;
+      font-weight: 600;
+      font-family: 'Inter', sans-serif;
+      letter-spacing: 0.5px;
+      pointer-events: none;
+    }
+
+    /* Textarea */
+    textarea {
+      width: 100%;
+      padding: 12px 16px;
+      background: #0c0c0c;
+      border: 1px solid #242424;
+      border-radius: 10px;
+      color: #ddd;
+      font-size: 14px;
+      font-family: 'Inter', sans-serif;
+      font-weight: 400;
+      transition: all 0.2s ease;
+      resize: vertical;
+      min-height: 90px;
+      line-height: 1.6;
+    }
+    textarea::placeholder { color: #2e2e2e; }
+    textarea:focus {
+      outline: none;
+      border-color: #555;
+      background: #0f0f0f;
+      box-shadow: 0 0 0 3px rgba(150,150,150,0.07), 0 0 20px rgba(150,150,150,0.04);
+      color: #eee;
+    }
 
     /* ── Optional Badge ── */
     .label-row {
@@ -303,11 +347,19 @@
       <div class="select-wrapper">
         <select id="tier">
           <option value="" id="opt-placeholder"></option>
-          <option value="Tier 1" id="opt-t1"></option>
-          <option value="Tier 2" id="opt-t2"></option>
-          <option value="Tier 3" id="opt-t3"></option>
-          <option value="Tier 4" id="opt-t4"></option>
+          <option value="Elite" id="opt-t1"></option>
+          <option value="Advanced" id="opt-t2"></option>
+          <option value="Medium" id="opt-t3"></option>
+          <option value="Regular" id="opt-t4"></option>
         </select>
+      </div>
+    </div>
+
+    <div class="field-group">
+      <label id="lbl-score"></label>
+      <div class="score-wrapper">
+        <input type="number" id="score" min="0" step="any"/>
+        <span class="score-unit">M</span>
       </div>
     </div>
 
@@ -327,6 +379,14 @@
       <input type="text" id="invitedBy" maxlength="50"/>
     </div>
 
+    <div class="field-group">
+      <div class="label-row">
+        <label id="lbl-reason-text"></label>
+        <span class="optional-badge" id="lbl-reason-optional"></span>
+      </div>
+      <textarea id="reason" maxlength="300"></textarea>
+    </div>
+
     <button class="submit-btn" id="submitBtn" onclick="submitForm()"></button>
     <div id="status"></div>
     <div id="retryNotice"></div>
@@ -335,7 +395,7 @@
   <div class="footer" id="txt-footer"></div>
 
 <script>
-  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxdY3P1Qk-MVBFLamYNkehg5AgPDydtdok4U_yDCQ7pIi90WKWRvL9_t9-Br-9j-4Ta/exec";
+  const SCRIPT_URL = "YOUR_APPS_SCRIPT_WEB_APP_URL_HERE";
   const MAX_RETRIES = 3;
   const RETRY_DELAY = 3000;
 
@@ -345,14 +405,18 @@
       subtitle:     "Last Z · Server Migration Event",
       lblServer:    "Server Number",
       lblTier:      "Migration Tier",
+      lblScore:     "Migration Score",
       lblUsername:  "In-Game Username",
       lblInvited:   "Invited By",
+      lblReason:    "Why do you want to come to Server 284?",
       optional:     "Optional",
-      hintInvited:  "Were you invited by someone? Enter the name of the player who invited you (e.g. a player from your state, or someone from S284 who brought you along).",
+      hintInvited:  "Were you invited by someone? Enter the name of the player who invited you (e.g. a player from your state, or someone from S284 that invited you).",
       placeholder:  "Select your tier",
       serverPH:     "e.g. S123",
+      scorePH:      "e.g. 500",
       usernamePH:   "Your IGN",
       invitedPH:    "Inviting player's IGN",
+      reasonPH:     "Tell us why you'd like to join S284...",
       submit:       "Submit Registration",
       submitting:   "Submitting...",
       success:      "✓  Registered successfully. See you at the migration.",
@@ -361,21 +425,25 @@
       networkFail:  "✕  Could not connect. Data saved locally — retry when online.",
       retrying:     (a, m) => `Connection issue — retrying... (${a}/${m})`,
       footer:       "Last Z SGSI · Migration Event",
-      tiers:        ["Tier 1", "Tier 2", "Tier 3", "Tier 4"]
+      tiers:        ["Elite", "Advanced", "Medium", "Regular"]
     },
     jp: {
       title:        "移住登録",
       subtitle:     "Last Z · サーバー移住イベント",
       lblServer:    "サーバー番号",
       lblTier:      "移住ティア",
+      lblScore:     "移住スコア",
       lblUsername:  "ゲーム内ユーザー名",
       lblInvited:   "招待者名",
+      lblReason:    "なぜServer 284に来たいのですか？",
       optional:     "任意",
-      hintInvited:  "誰かに招待されましたか？招待してくれたプレイヤーの名前を入力してください（例：同じ州のプレイヤー、またはS284から一緒に来た方など）。",
+      hintInvited:  "誰かに招待されましたか？招待してくれたプレイヤーの名前を入力してください（例：同じ州のプレイヤー、またはS284から招待してくれた方）。",
       placeholder:  "ティアを選択",
       serverPH:     "例: S123",
+      scorePH:      "例: 500",
       usernamePH:   "IGN を入力",
       invitedPH:    "招待者の IGN",
+      reasonPH:     "S284に参加したい理由を教えてください...",
       submit:       "登録する",
       submitting:   "送信中...",
       success:      "✓  登録完了！移住イベントでお会いしましょう。",
@@ -384,21 +452,25 @@
       networkFail:  "✕  接続できませんでした。データはローカルに保存されました。",
       retrying:     (a, m) => `接続エラー — 再試行中... (${a}/${m})`,
       footer:       "Last Z SGSI · 移住イベント",
-      tiers:        ["ティア 1", "ティア 2", "ティア 3", "ティア 4"]
+      tiers:        ["エリート", "アドバンスド", "ミディアム", "レギュラー"]
     },
     kr: {
       title:        "이주 등록",
       subtitle:     "Last Z · 서버 이주 이벤트",
       lblServer:    "서버 번호",
       lblTier:      "이주 티어",
+      lblScore:     "이주 점수",
       lblUsername:  "게임 내 닉네임",
       lblInvited:   "초대한 플레이어",
+      lblReason:    "왜 Server 284에 오고 싶으신가요?",
       optional:     "선택",
-      hintInvited:  "누군가에게 초대받으셨나요? 초대해 준 플레이어의 닉네임을 입력해 주세요 (예: 같은 주의 플레이어, 또는 S284에서 함께 온 분).",
+      hintInvited:  "누군가에게 초대받으셨나요? 초대해 준 플레이어의 닉네임을 입력해 주세요 (예: 같은 주의 플레이어, 또는 S284에서 초대해 준 분).",
       placeholder:  "티어 선택",
       serverPH:     "예: S123",
+      scorePH:      "예: 500",
       usernamePH:   "닉네임 입력",
       invitedPH:    "초대한 플레이어의 닉네임",
+      reasonPH:     "S284에 합류하고 싶은 이유를 알려주세요...",
       submit:       "등록하기",
       submitting:   "제출 중...",
       success:      "✓  등록 완료! 이주 이벤트에서 만나요.",
@@ -407,7 +479,7 @@
       networkFail:  "✕  연결할 수 없습니다. 데이터가 로컬에 저장되었습니다.",
       retrying:     (a, m) => `연결 오류 — 재시도 중... (${a}/${m})`,
       footer:       "Last Z SGSI · 이주 이벤트",
-      tiers:        ["티어 1", "티어 2", "티어 3", "티어 4"]
+      tiers:        ["엘리트", "어드밴스드", "미디엄", "레귤러"]
     }
   };
 
@@ -416,20 +488,25 @@
   function applyLang(lang) {
     const t = LANGS[lang];
     currentLang = lang;
-    document.getElementById("txt-title").textContent       = t.title;
-    document.getElementById("txt-subtitle").textContent    = t.subtitle;
-    document.getElementById("lbl-server").textContent      = t.lblServer;
-    document.getElementById("lbl-tier").textContent        = t.lblTier;
-    document.getElementById("lbl-username").textContent    = t.lblUsername;
-    document.getElementById("lbl-invited-text").textContent = t.lblInvited;
-    document.getElementById("lbl-optional").textContent    = t.optional;
-    document.getElementById("hint-invited").textContent    = t.hintInvited;
-    document.getElementById("submitBtn").textContent       = t.submit;
-    document.getElementById("txt-footer").textContent      = t.footer;
-    document.getElementById("server").placeholder          = t.serverPH;
-    document.getElementById("username").placeholder        = t.usernamePH;
-    document.getElementById("invitedBy").placeholder       = t.invitedPH;
-    document.getElementById("opt-placeholder").textContent = t.placeholder;
+    document.getElementById("txt-title").textContent         = t.title;
+    document.getElementById("txt-subtitle").textContent      = t.subtitle;
+    document.getElementById("lbl-server").textContent        = t.lblServer;
+    document.getElementById("lbl-tier").textContent          = t.lblTier;
+    document.getElementById("lbl-score").textContent         = t.lblScore;
+    document.getElementById("lbl-username").textContent      = t.lblUsername;
+    document.getElementById("lbl-invited-text").textContent  = t.lblInvited;
+    document.getElementById("lbl-optional").textContent      = t.optional;
+    document.getElementById("hint-invited").textContent      = t.hintInvited;
+    document.getElementById("lbl-reason-text").textContent   = t.lblReason;
+    document.getElementById("lbl-reason-optional").textContent = t.optional;
+    document.getElementById("submitBtn").textContent         = t.submit;
+    document.getElementById("txt-footer").textContent        = t.footer;
+    document.getElementById("server").placeholder            = t.serverPH;
+    document.getElementById("score").placeholder             = t.scorePH;
+    document.getElementById("username").placeholder          = t.usernamePH;
+    document.getElementById("invitedBy").placeholder         = t.invitedPH;
+    document.getElementById("reason").placeholder            = t.reasonPH;
+    document.getElementById("opt-placeholder").textContent   = t.placeholder;
     document.getElementById("opt-t1").textContent = t.tiers[0];
     document.getElementById("opt-t2").textContent = t.tiers[1];
     document.getElementById("opt-t3").textContent = t.tiers[2];
@@ -456,16 +533,18 @@
     const t         = LANGS[currentLang];
     const server    = document.getElementById("server").value.trim();
     const tier      = document.getElementById("tier").value;
+    const score     = document.getElementById("score").value.trim();
     const username  = document.getElementById("username").value.trim();
     const invitedBy = document.getElementById("invitedBy").value.trim();
+    const reason    = document.getElementById("reason").value.trim();
     const btn       = document.getElementById("submitBtn");
 
-    if (!server || !tier || !username) {
+    if (!server || !tier || !score || !username) {
       setStatus(t.missingFields, "warning");
       return;
     }
 
-    const payload = { server, tier, username, invitedBy: invitedBy || "" };
+    const payload = { server, tier, score, username, invitedBy: invitedBy || "", reason: reason || "" };
     btn.disabled = true;
     setStatus(t.submitting, "info");
 
@@ -475,8 +554,10 @@
       setStatus(t.success, "success");
       document.getElementById("server").value    = "";
       document.getElementById("tier").value      = "";
+      document.getElementById("score").value     = "";
       document.getElementById("username").value  = "";
       document.getElementById("invitedBy").value = "";
+      document.getElementById("reason").value    = "";
     } else if (result !== "duplicate") {
       saveLocalBackup(payload);
       setStatus(t.networkFail, "error");
