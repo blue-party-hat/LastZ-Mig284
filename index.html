@@ -1,1 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Last Z – Migration Registration</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: #0f0f0f; color: #eee; font-family: sans-serif; display: flex; justify-content: center; padding: 40px 16px; min-height: 100vh; }
+    .card { background: #1a1a1a; border: 1px solid #2a2a2a; border-radius: 14px; padding: 32px 28px; max-width: 460px; width: 100%; }
+    h2 { color: #f0a500; text-align: center; margin-bottom: 8px; font-size: 22px; }
+    .subtitle { text-align: center; color: #666; font-size: 13px; margin-bottom: 28px; }
+    label { display: block; margin: 16px 0 6px; font-size: 13px; color: #999; text-transform: uppercase; letter-spacing: 0.5px; }
+    input, select { width: 100%; padding: 11px 14px; background: #222; border: 1px solid #383838; border-radius: 8px; color: #fff; font-size: 15px; transition: border 0.2s; }
+    input:focus, select:focus { outline: none; border-color: #f0a500; }
+    select option { background: #222; }
+    button { margin-top: 26px; width: 100%; padding: 13px; background: #f0a500; color: #111; font-weight: bold; border: none; border-radius: 9px; font-size: 16px; cursor: pointer; transition: background 0.2s; }
+    button:hover:not(:disabled) { background: #ffc233; }
+    button:disabled { background: #555; color: #888; cursor: not-allowed; }
+    #status { margin-top: 16px; text-align: center; font-size: 14px; min-height: 20px; padding: 8px; border-radius: 6px; }
+    .status-success { background: rgba(80,200,80,0.1); color: #5fc85f; }
+    .status-error   { background: rgba(200,80,80,0.1); color: #e06060; }
+    .status-warning { background: rgba(240,165,0,0.1); color: #f0a500; }
+    .status-info    { color: #888; }
+    .retry-notice { font-size: 12px; color: #666; text-align: center; margin-top: 10px; display: none; }
+  </style>
+</head>
+<body>
+<div class="card">
+  <h2>⚔️ Migration Registration</h2>
+  <p class="subtitle">Last Z – Server Migration Event</p>
 
+  <label>Server Number</label>
+  <input type="text" id="server" placeholder="e.g. S123" maxlength="20"/>
+
+  <label>Migration Tier</label>
+  <select id="tier">
+    <option value="">-- Select Your Tier --</option>
+    <option value="Tier 1">Tier 1</option>
+    <option value="Tier 2">Tier 2</option>
+    <option value="Tier 3">Tier 3</option>
+    <option value="Tier 4">Tier 4</option>
+  </select>
+
+  <label>In-Game Username</label>
+  <input type="text" id="username" placeholder="Your IGN" maxlength="50"/>
+
+  <button id="submitBtn" onclick="submitForm()">Submit Registration</button>
+  <div id="status"></div>
+  <div id="retryNotice" class="retry-notice"></div>
+</div>
+
+<script>
+  const SCRIPT_URL = "YOUR_APPS_SCRIPT_WEB_APP_URL_HERE";
+  const MAX_RETRIES = 3;
+  const RETRY_DELAY = 3000; // 3 seconds between retries
+
+  async function submitForm() {
+    const server   = document.getElementById("server").value.trim();
+    const tier     = document.getElementById("tier").value;
+    const username = document.getElementById("username").value.trim();
+    const btn      = document.getElementById("submitBtn");
+
+    // Frontend validation
+    if (!server || !tier || !username) {
+      setStatus("⚠️ Please fill in all fields.", "warning");
+      return;
+    }
+
+    const payload = { server, tier, username };
+    btn.disabled = true;
+    setStatus("Submitting...", "info");
+
+    // Attempt submission with automatic retry
+    const success = await submitWithRetry(payload, MAX_RETRIES);
+
+    if (success) {
+      setStatus("✅ Registered successfully! See you at the migration.", "success");
+      document.getElementById("server").value = "";
+      document.getElementById("tier").value = "";
+      document.getElementById("username").value = "";
+    } else {
+      // Save locally as fallback if all retries fail
+      saveLocalBackup(payload);
+      setStatus("❌ Could not connect. Your data has been saved locally — tap Submit again when you have connection.", "error");
+    }
+
+    btn.disabled = false;
+    document.getElementById("retryNotice").style.display = "none";
+  }
+
+  async function submitWithRetry(payload, retries) {
+    for (let attempt = 1; attempt <= retries; attempt++) {
+      try {
+        const res = await fetch(SCRIPT_URL, {
+          method: "POST",
+          body: JSON.stringify(payload),
+        });
+
+        const data = await res.json();
+
+        if (data.result === "success") return true;
+        if (data.result === "duplicate") {
+          setStatus("⚠️ You are already registered with this username and server.", "warning");
+          return true; // Not a network error, stop retrying
+        }
+        if (data.result === "error" && data.message === "Server busy, please retry") {
+          // Backend was locked — worth retrying
+        } else {
+          return false; // Other backend error, don't retry
+        }
+
+      } catch (err) {
+        // Network failure — retry
+      }
+
+      if (attempt < retries) {
+        document.getElementById("retryNotice").style.display = "block";
+        document.getElementById("retryNotice").textContent =
+          `Connection issue — retrying... (${attempt}/${retries})`;
+        await delay(RETRY_DELAY);
+      }
+    }
+    return false;
+  }
+
+  // Saves data to browser localStorage as a backup
+  function saveLocalBackup(payload) {
+    const backups = JSON.parse(localStorage.getItem("migrationBackup") || "[]");
+    backups.push({ ...payload, savedAt: new Date().toISOString() });
+    localStorage.setItem("migrationBackup", JSON.stringify(backups));
+  }
+
+  function setStatus(msg, type) {
+    const el = document.getElementById("status");
+    el.textContent = msg;
+    el.className = `status-${type}`;
+  }
+
+  function delay(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
+</script>
+</body>
+</html>
