@@ -23,7 +23,6 @@
         radial-gradient(ellipse at 80% 80%, rgba(120,120,120,0.04) 0%, transparent 60%);
     }
 
-    /* ── Language Bar ── */
     .lang-bar {
       display: flex;
       gap: 6px;
@@ -54,7 +53,6 @@
       box-shadow: 0 2px 12px rgba(180,180,180,0.2);
     }
 
-    /* ── Card ── */
     .card {
       background: linear-gradient(160deg, #141414, #0e0e0e);
       border: 1px solid #1f1f1f;
@@ -77,11 +75,7 @@
       background: linear-gradient(90deg, transparent, rgba(200,200,200,0.15), transparent);
     }
 
-    /* ── Header ── */
-    .card-header {
-      text-align: center;
-      margin-bottom: 32px;
-    }
+    .card-header { text-align: center; margin-bottom: 32px; }
     .card-icon {
       font-size: 36px;
       display: block;
@@ -106,7 +100,6 @@
       text-transform: uppercase;
     }
 
-    /* ── Form Fields ── */
     .field-group { margin-top: 20px; }
 
     label {
@@ -150,12 +143,11 @@
       color: #eee;
     }
 
-    /* Hide number input arrows */
+    /* Hide number input arrows for all number fields */
     input[type=number]::-webkit-inner-spin-button,
     input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
     input[type=number] { -moz-appearance: textfield; }
 
-    /* Custom select arrow */
     .select-wrapper { position: relative; }
     .select-wrapper::after {
       content: '▾';
@@ -169,12 +161,7 @@
     }
     select option { background: #111; color: #ddd; }
 
-    /* Score input with M unit */
-    .score-wrapper {
-      position: relative;
-      display: flex;
-      align-items: center;
-    }
+    .score-wrapper { position: relative; display: flex; align-items: center; }
     .score-wrapper input { padding-right: 40px; }
     .score-unit {
       position: absolute;
@@ -187,7 +174,6 @@
       pointer-events: none;
     }
 
-    /* Textarea */
     textarea {
       width: 100%;
       padding: 12px 16px;
@@ -212,13 +198,7 @@
       color: #eee;
     }
 
-    /* ── Optional Badge ── */
-    .label-row {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      margin-bottom: 7px;
-    }
+    .label-row { display: flex; align-items: center; gap: 8px; margin-bottom: 7px; }
     .label-row label { margin-bottom: 0; }
     .optional-badge {
       font-size: 9px;
@@ -232,7 +212,6 @@
       letter-spacing: 0.8px;
     }
 
-    /* ── Divider ── */
     .divider {
       border: none;
       height: 1px;
@@ -240,7 +219,6 @@
       margin: 28px 0 8px;
     }
 
-    /* ── Submit Button ── */
     .submit-btn {
       margin-top: 28px;
       width: 100%;
@@ -282,7 +260,6 @@
       box-shadow: none;
     }
 
-    /* ── Status ── */
     #status {
       margin-top: 16px;
       text-align: center;
@@ -299,7 +276,6 @@
     .status-warning { background: rgba(180,160,80,0.07); color: #b8a84a; border: 1px solid rgba(180,160,80,0.12); }
     .status-info    { color: #333; border: none; background: none; }
 
-    /* ── Retry Notice ── */
     #retryNotice {
       font-size: 11px;
       color: #333;
@@ -309,7 +285,6 @@
       letter-spacing: 0.2px;
     }
 
-    /* ── Footer ── */
     .footer {
       margin-top: 36px;
       font-size: 11px;
@@ -322,14 +297,12 @@
 </head>
 <body>
 
-  <!-- Language Switcher -->
   <div class="lang-bar">
     <button class="lang-btn active" onclick="setLang('en', this)">EN</button>
     <button class="lang-btn" onclick="setLang('jp', this)">日本語</button>
     <button class="lang-btn" onclick="setLang('kr', this)">한국어</button>
   </div>
 
-  <!-- Card -->
   <div class="card">
     <div class="card-header">
       <span class="card-icon">⚔️</span>
@@ -339,7 +312,7 @@
 
     <div class="field-group">
       <label id="lbl-server"></label>
-      <input type="text" id="server" maxlength="20"/>
+      <input type="number" id="server" min="1" max="9999"/>
     </div>
 
     <div class="field-group">
@@ -395,7 +368,7 @@
   <div class="footer" id="txt-footer"></div>
 
 <script>
-  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxdY3P1Qk-MVBFLamYNkehg5AgPDydtdok4U_yDCQ7pIi90WKWRvL9_t9-Br-9j-4Ta/exec";
+  const SCRIPT_URL = "YOUR_APPS_SCRIPT_WEB_APP_URL_HERE";
   const MAX_RETRIES = 3;
   const RETRY_DELAY = 3000;
 
@@ -412,16 +385,17 @@
       optional:     "Optional",
       hintInvited:  "Were you invited by someone? Enter the name of the player who invited you (e.g. a player from your state, or someone from S284 that invited you).",
       placeholder:  "Select your tier",
-      serverPH:     "e.g. S123",
+      serverPH:     "e.g. 123",
       scorePH:      "e.g. 500",
       usernamePH:   "Your IGN",
       invitedPH:    "Inviting player's IGN",
       reasonPH:     "Tell us why you'd like to join S284...",
       submit:       "Submit Registration",
       submitting:   "Submitting...",
-      success:      "✓  Completed!",
-      duplicate:    "⚠  Already registered with this username and server.",
+      success:      "Completed!",
+      duplicate:    "⚠  Already registered with this username.",
       missingFields:"⚠  Please fill in all required fields.",
+      invalidServer:"⚠  Server number must be a valid number.",
       networkFail:  "✕  Could not connect. Data saved locally — retry when online.",
       retrying:     (a, m) => `Connection issue — retrying... (${a}/${m})`,
       footer:       "Last Z SGSI · Migration Event",
@@ -439,16 +413,17 @@
       optional:     "任意",
       hintInvited:  "誰かに招待されましたか？招待してくれたプレイヤーの名前を入力してください（例：同じ州のプレイヤー、またはS284から招待してくれた方）。",
       placeholder:  "ティアを選択",
-      serverPH:     "例: S123",
+      serverPH:     "例: 123",
       scorePH:      "例: 500",
       usernamePH:   "IGN を入力",
       invitedPH:    "招待者の IGN",
       reasonPH:     "S284に参加したい理由を教えてください...",
       submit:       "登録する",
       submitting:   "送信中...",
-      success:      "✓  登録完了！",
-      duplicate:    "⚠  このユーザー名とサーバーはすでに登録されています。",
+      success:      "Completed!",
+      duplicate:    "⚠  このユーザー名はすでに登録されています。",
       missingFields:"⚠  すべての必須項目を入力してください。",
+      invalidServer:"⚠  サーバー番号は数字で入力してください。",
       networkFail:  "✕  接続できませんでした。データはローカルに保存されました。",
       retrying:     (a, m) => `接続エラー — 再試行中... (${a}/${m})`,
       footer:       "Last Z SGSI · 移住イベント",
@@ -466,16 +441,17 @@
       optional:     "선택",
       hintInvited:  "누군가에게 초대받으셨나요? 초대해 준 플레이어의 닉네임을 입력해 주세요 (예: 같은 주의 플레이어, 또는 S284에서 초대해 준 분).",
       placeholder:  "티어 선택",
-      serverPH:     "예: S123",
+      serverPH:     "예: 123",
       scorePH:      "예: 500",
       usernamePH:   "닉네임 입력",
       invitedPH:    "초대한 플레이어의 닉네임",
       reasonPH:     "S284에 합류하고 싶은 이유를 알려주세요...",
       submit:       "등록하기",
       submitting:   "제출 중...",
-      success:      "✓  등록 완료!",
-      duplicate:    "⚠  이미 이 닉네임과 서버로 등록되어 있습니다.",
+      success:      "Completed!",
+      duplicate:    "⚠  이미 이 닉네임으로 등록되어 있습니다.",
       missingFields:"⚠  모든 필수 항목을 입력해 주세요.",
+      invalidServer:"⚠  서버 번호는 숫자로 입력해 주세요.",
       networkFail:  "✕  연결할 수 없습니다. 데이터가 로컬에 저장되었습니다.",
       retrying:     (a, m) => `연결 오류 — 재시도 중... (${a}/${m})`,
       footer:       "Last Z SGSI · 이주 이벤트",
@@ -488,25 +464,25 @@
   function applyLang(lang) {
     const t = LANGS[lang];
     currentLang = lang;
-    document.getElementById("txt-title").textContent         = t.title;
-    document.getElementById("txt-subtitle").textContent      = t.subtitle;
-    document.getElementById("lbl-server").textContent        = t.lblServer;
-    document.getElementById("lbl-tier").textContent          = t.lblTier;
-    document.getElementById("lbl-score").textContent         = t.lblScore;
-    document.getElementById("lbl-username").textContent      = t.lblUsername;
-    document.getElementById("lbl-invited-text").textContent  = t.lblInvited;
-    document.getElementById("lbl-optional").textContent      = t.optional;
-    document.getElementById("hint-invited").textContent      = t.hintInvited;
-    document.getElementById("lbl-reason-text").textContent   = t.lblReason;
+    document.getElementById("txt-title").textContent          = t.title;
+    document.getElementById("txt-subtitle").textContent       = t.subtitle;
+    document.getElementById("lbl-server").textContent         = t.lblServer;
+    document.getElementById("lbl-tier").textContent           = t.lblTier;
+    document.getElementById("lbl-score").textContent          = t.lblScore;
+    document.getElementById("lbl-username").textContent       = t.lblUsername;
+    document.getElementById("lbl-invited-text").textContent   = t.lblInvited;
+    document.getElementById("lbl-optional").textContent       = t.optional;
+    document.getElementById("hint-invited").textContent       = t.hintInvited;
+    document.getElementById("lbl-reason-text").textContent    = t.lblReason;
     document.getElementById("lbl-reason-optional").textContent = t.optional;
-    document.getElementById("submitBtn").textContent         = t.submit;
-    document.getElementById("txt-footer").textContent        = t.footer;
-    document.getElementById("server").placeholder            = t.serverPH;
-    document.getElementById("score").placeholder             = t.scorePH;
-    document.getElementById("username").placeholder          = t.usernamePH;
-    document.getElementById("invitedBy").placeholder         = t.invitedPH;
-    document.getElementById("reason").placeholder            = t.reasonPH;
-    document.getElementById("opt-placeholder").textContent   = t.placeholder;
+    document.getElementById("submitBtn").textContent          = t.submit;
+    document.getElementById("txt-footer").textContent         = t.footer;
+    document.getElementById("server").placeholder             = t.serverPH;
+    document.getElementById("score").placeholder              = t.scorePH;
+    document.getElementById("username").placeholder           = t.usernamePH;
+    document.getElementById("invitedBy").placeholder          = t.invitedPH;
+    document.getElementById("reason").placeholder             = t.reasonPH;
+    document.getElementById("opt-placeholder").textContent    = t.placeholder;
     document.getElementById("opt-t1").textContent = t.tiers[0];
     document.getElementById("opt-t2").textContent = t.tiers[1];
     document.getElementById("opt-t3").textContent = t.tiers[2];
@@ -530,17 +506,24 @@
   });
 
   async function submitForm() {
-    const t         = LANGS[currentLang];
-    const server    = document.getElementById("server").value.trim();
-    const tier      = document.getElementById("tier").value;
-    const score     = document.getElementById("score").value.trim();
-    const username  = document.getElementById("username").value.trim();
+    const t        = LANGS[currentLang];
+    const server   = document.getElementById("server").value.trim();
+    const tier     = document.getElementById("tier").value;
+    const score    = document.getElementById("score").value.trim();
+    const username = document.getElementById("username").value.trim();
     const invitedBy = document.getElementById("invitedBy").value.trim();
-    const reason    = document.getElementById("reason").value.trim();
-    const btn       = document.getElementById("submitBtn");
+    const reason   = document.getElementById("reason").value.trim();
+    const btn      = document.getElementById("submitBtn");
 
+    // Required fields check
     if (!server || !tier || !score || !username) {
       setStatus(t.missingFields, "warning");
+      return;
+    }
+
+    // Server must be a valid positive number
+    if (isNaN(server) || Number(server) <= 0) {
+      setStatus(t.invalidServer, "warning");
       return;
     }
 
